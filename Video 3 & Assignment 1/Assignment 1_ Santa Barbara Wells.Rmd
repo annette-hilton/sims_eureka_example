@@ -16,7 +16,7 @@ Data: We are using well water measurements from the U.S. Geological Survey for t
 
 Here is a map of the wells we are examining: 
 
-![](/cloud/project/Video 3 & Assignment 1/map_sb_gw.png)
+![](map_sb_gw.png)
 
 
 # Attach Packages and Data 

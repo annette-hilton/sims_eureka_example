@@ -16,7 +16,7 @@ This is your final assignment! Here you will practice all we learned in Assignme
 Data: We are using well water measurements from the U.S. Geological Survey. 
 
 
-![](/cloud/project/Video 4 & Assignment 2/california_wells.jpg){width=450px}
+![](california_wells.jpg){width=450px}
 
 # Attach Packages and Data 
 
