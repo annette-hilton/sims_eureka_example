@@ -1,0 +1,217 @@
+---
+title: 'Assignment 1: Santa Barbara Wells'
+author: your name here 
+date: put date here 
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+```
+# Objectives 
+
+In this assignment, you will learn how to load data into RStudio Cloud, analyze these data for specific parameters, and plot a final figure! 
+
+Data: We are using well water measurements from the U.S. Geological Survey for the Santa Barbara area. 
+
+Here is a map of the wells we are examining: 
+
+![](/cloud/project/Video 3 & Assignment 1/map_sb_gw.png)
+
+
+# Attach Packages and Data 
+
+## Attach Packages 
+
+We attach packages to RStudio Cloud every time we open RStudio Cloud. This tells RStudio to access the packages in R's memory. 
+
+```{r}
+# Attach `tidyverse` package. The tidyverse is a large package that allows you to do a lot of cool stuff in RStudio! 
+
+library(tidyverse)
+
+# Disable scientific notation 
+options(scipen=999)
+
+```
+
+**Quick Coding Tips:** 
+
+- Start a new code chunk: ctrl + alt + I (command + option + I on mac) 
+- ` %>% ` means "and then" to R: it tells R to continue and run the code as one 
+- Tip: use keyboard shortcut `ctrl + shift + M` to generate ` %>% ` 
+- ` <- ` means "from" to R: it tells R to use what follows it 
+- Tip: use keyboard shortcut ` alt + minus sign (-) ` to generate ` <- ` 
+- \# in a code chunk means it is annotation, not code (and will not run as code)
+
+
+```{r}
+# Practice using the keyboard shortcuts for %>%  and <-  here! 
+# Erase after creating, or your document will not knit (or comment out using ctrl + shift + c) 
+
+
+```
+
+## Upload Data 
+
+Let's upload the data we will use for this assignment! We are using groundwater well level measurements from the U.S. Geological Survey (USGS) for Santa Barbara. 
+
+```{r}
+
+# Upload data using `readr` package. This allows us to read data into RStudio. 
+# We also use the package `here`. This package allows us to specify where R should look for the file (how to navigate folders). 
+
+sb_wells <- readr::read_csv(here::here("Video 3 & Assignment 1", "santa_barbara_wells.txt"))
+
+# Change the site ID column to a character column (so it is recognized as a name, not numbers) using the `as.character()` function 
+
+sb_wells$site_id <- as.character(sb_wells$site_id)
+
+```
+
+```{r}
+# YOUR NAME HERE 
+
+
+
+
+
+
+```
+
+# Data Analysis 
+
+Our objectives: 
+
+1. Find the longest records of well water levels in Santa Barbara (wells that have the most years of data collection and the most measurements) 
+2. Make a visualization of the well water levels from these long-term wells (what has happened to water in the wells over time?)
+
+Our steps: 
+
+1. Find the longest year records 
+2. Calculate the median well water record for each year 
+3. From those years, find records with the most measurements overall 
+4. Plot the well water levels in a visualization
+
+## Step 1: Find the longest well records (most years recorded) 
+
+```{r}
+
+sb_wells_long_records <- sb_wells %>% # Create a new data frame from our original data file 
+  group_by(site_id) %>% # Tell R to group by site ID 
+  mutate(min_date = min(year), # Create a new column using the function `mutate()`: for minimum and maximum years 
+         max_date = max(year)) %>% 
+  filter(max_date >= 2015, # Use the `filter()` function to sort by minimum and maximum years for each site ID (well)
+         min_date <= 1950) # We want any wells that have measurements from 1950 or before, and 2015 or later (long term) 
+  
+```
+
+```{r}
+# YOUR NAME HERE 
+
+
+
+
+
+
+
+
+
+
+```
+
+## Step 2: Calculate the median well water record for each year 
+
+Some records have more than one measurement per year. Well water levels do not typically change significantly over a period of one year, so we will take the median water level for each year. 
+
+```{r}
+
+sb_wells_median <- sb_wells_long_records %>% # Create a new data frame from 'sb_wells_long_records' 
+  group_by(site_id, year) %>% # Group by site ID and year
+  mutate(water_level_median = median(water_level)) %>% # Use `mutate()` to create a new column for median water level
+                                                      # Use `median()` function to calculate median 
+  distinct(site_id, year, .keep_all = TRUE) %>% # Use `distinct()` function to keep only one row for each year, each site ID 
+  ungroup() # Ungroup 
+
+```
+
+```{r}
+# YOUR NAME HERE 
+
+
+
+
+
+
+
+
+
+```
+
+## Step 3: Find long-term records (most measurements)
+
+```{r}
+sb_wells_final <- sb_wells_median %>% # Create a new data frame from 'sb_wells_median' 
+  group_by(site_id) %>% # Group by site ID 
+  filter(n() >= 60) # Use `filter()` and `n()` functions to keep only records that have more than 60 measurements (60 years at least) 
+  
+# Check how many wells this gives us 
+# Use `unique()` function to see how many unique wells are in the site_id column 
+
+long_term_wells <- unique(sb_wells_final$site_id)
+long_term_wells
+
+# The result is 4 wells! 
+
+```
+
+```{r}
+# YOUR NAME HERE 
+
+
+
+
+
+
+
+
+
+
+```
+
+
+## Step 4: Plot results! 
+
+Now let's make a visualization that will show us our 4 long-term wells 
+
+```{r}
+# We will use `ggplot()` function to make visualizations 
+
+ggplot(data = sb_wells_final, # tell R what data frame to use 
+       aes(x = year, # give R the x-axis variable 
+           y = water_level_median, # give R the y-axis variable 
+           group = site_id, # tell R how to group the variables (by site ID)
+           color = site_id)) + # tell R to color the site IDs differently 
+  geom_line() + # tell R you want a line graph 
+  scale_y_reverse() + # tell R to reverse the y-axis 
+  scale_color_brewer(palette = "RdYlBu") # specify a specific color palette 
+
+```
+
+
+```{r}
+# YOUR NAME HERE 
+
+
+
+
+
+
+
+
+```
+
+
+
+## Final Step: Knit your document! *Click the Knit Button!* 
+

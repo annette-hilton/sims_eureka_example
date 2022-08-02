@@ -1,0 +1,414 @@
+---
+title: 'Assignment 2: California Wells'
+author: "Your Name Here"
+date: "date here"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+```
+
+# Objectives 
+
+This is your final assignment! Here you will practice all we learned in Assignment 1, and make a final figure for the figure competition. 
+
+Data: We are using well water measurements from the U.S. Geological Survey. 
+
+
+![](/cloud/project/Video 4 & Assignment 2/california_wells.jpg){width=450px}
+
+# Attach Packages and Data 
+
+## Attach Packages 
+
+We attach packages to RStudio Cloud every time we open RStudio Cloud. This tells RStudio to access the packages in R's memory. 
+
+```{r}
+# Attach `tidyverse` package. The tidyverse is a large package that allows you to do a lot of cool stuff in RStudio! 
+
+library(tidyverse)
+library(gganimate)
+library(gifski)
+library(viridis)
+
+# Disable scientific notation 
+options(scipen=999)
+
+```
+
+## Upload Data 
+
+Let's upload the data we will use for this assignment! We are using groundwater well level measurements from the U.S. Geological Survey (USGS) for all of California. 
+
+```{r}
+# Upload data using `readr` package. This allows us to read data into RStudio. 
+# We also use the package `here`. This package allows us to specify where R should look for the file (navigate folders). 
+
+ca_wells <- readr::read_csv(here::here("Video 4 & Assignment 2", "california_wells.txt"))
+
+# Change the site ID column to a character column (recognized as a name, not numbers) using the `as.character()` function 
+ca_wells$site_id <- as.character(ca_wells$site_id)
+
+```
+
+# Data Analysis 
+
+Our objectives: 
+
+1. Find the longest records of well water levels in California (the most years, the most measurements) 
+2. Make multiple visualizations of the well water levels from these long-term wells (you will make at least two figures!)
+
+Our steps: 
+
+1. Find the longest year records 
+2. Calculate the median well water record for each year 
+3. From those years, find records with the most measurements overall 
+4. Plot the well water levels in at least two visualizations 
+5. Create your final visualization for the competition 
+
+**Quick Coding Tips:** 
+
+- ` %>% ` means "and then" to R: it tells R to continue and run the code as one 
+- Tip: use keyboard shortcut `ctrl + shift + M` to generate ` %>% ` 
+- ` <- ` means "from" to R: it tells R to use what follows it 
+- Tip: use keyboard shortcut ` alt + minus sign (-) ` to generate ` <- ` 
+
+
+## Step 1: Find the longest well records (most years recorded) 
+
+```{r}
+# Create a new data frame called 'ca_wells_long_records' from our original data file 'ca_wells'
+# Tell R to group by site ID 
+# Create a new column using the function `mutate()`: for minimum and maximum years 
+# Use the `filter()` function to sort by minimum and maximum years for each site ID (well)
+
+# First find any wells that have measurements from 1950 or before (min), and 2015 or later (max)
+
+ca_wells_long_records <- ca_wells %>% # Create a new data frame from our original data file 
+  group_by(site_id) %>% # Tell R to group by site ID 
+  mutate(min_date = min(year), # Create a new column using the function `mutate()`: for minimum and maximum years 
+         max_date = max(year)) %>% 
+  filter(max_date >= 2010, # Use the `filter()` function to sort by minimum and maximum years for each site ID (well)
+         min_date <= 1960) # We want any wells that have measurements from 1950 or before, and 2015 or later (long term) 
+
+# 1950/2015: 27746
+# 1960/2010: 53094
+
+
+
+# How many observations are there? 
+# Answer: 
+
+
+# Now change the numbers in your code and find any wells that have measurements from 1960 or before (min), and 2010 or later (max) 
+
+# How many observations are there? 
+# Answer: 
+ 
+  
+```
+
+#### How many observations are there? 
+
+Write your answers here: 
+
+- <= 1950 (min) & >= 2015 (max): 
+
+- <= 1960 (min) & >= 2010 (max): 
+
+
+## Step 2: Calculate the median well water record for each year 
+
+Some records have more than one measurement per year. Well water levels do not typically change significantly over a period of one year, so we will take the median water level for each year. 
+
+```{r}
+# Create a new data frame called 'ca_wells_median' from 'ca_wells_long_records' 
+# Group by site ID and year
+# Use `mutate()` to create a new column for median water level
+# Use `median()` function to calculate median 
+# Use `distinct()` function to keep only one row for each year, each site ID 
+# Ungroup 
+
+ca_wells_median <- ca_wells_long_records %>%  
+  group_by(site_id, year) %>%
+  mutate(water_level_median = median(water_level)) %>% 
+  distinct(site_id, year, .keep_all = TRUE) %>% 
+  ungroup() 
+
+
+
+```
+
+## Step 3: Find long-term records (most measurements)
+
+```{r}
+# Create a new data frame called 'ca_wells_final' from 'ca_wells_median' 
+# Group by site ID 
+# Use `filter()` and `n()` functions to keep only records that have more than: (A) 60 measurements
+
+ca_wells_final <- ca_wells_median %>%  
+  group_by(site_id) %>% 
+  filter(n() >= 80) 
+  
+# Check how many wells this gives us 
+# Use `unique()` function to see how many unique wells are in the site_id column 
+
+long_term_wells <- unique(ca_wells_final$site_id)
+long_term_wells
+
+# (A): 72
+# (B): 20
+# (C): 
+
+
+
+  
+# Check how many wells this gives us 
+# Use `unique()` function to see how many unique wells are in the site_id column 
+
+
+# (A) 60 measurements: 
+
+
+
+# Now change your filter variable from 60  measurements to 75 
+# Rerun code and rerun the unique function
+# How many wells do you have now? (Answer below)
+
+# (B) 75 measurements: 
+
+
+
+# Now change your filter variable from 60 measurements to some other number greater than 75. What is the number and how many wells do you have now? If you return zero wells, reduce your number. 
+
+
+
+# (C) Your choice: 
+
+
+```
+
+#### How many wells result? 
+
+Write your answers here: 
+
+- (A): 
+
+- (B): 
+
+- (C): 
+
+
+## Step 4: Plot results! 
+
+Now let's make a visualization that will show us our long-term wells for (C), your choice of number of measurements 
+
+
+First plot: Basic visualization of all your wells from (C) 
+
+
+```{r}
+ca_wells_plot <- ca_wells_final %>% 
+  filter(site_id %in% c("340535117573501", "343613120164501"))
+```
+
+```{r}
+# Use `ggplot()` function 
+# Remember to tell R which data frame to use ('ca_wells_final')
+# Remember to tell R the x-axis variable, and y-axis variable in function `aes()` 
+# Tell R how to group the variables (by site_id) 
+# Tell R how to color the site 
+# Tell R what type of graph you want (`geom_line()`)
+# Reverse y-axis 
+# Specify a color palette 
+# Reverse the y-axis (`scale_y_reverse()`)
+
+ggplot(data = ca_wells_plot, 
+       aes(x = year, 
+           y = water_level_median, 
+           group = site_id, 
+                    color = site_id)) + 
+  geom_line() + 
+  geom_point() +
+  scale_y_reverse()+
+  scale_x_continuous(limits = c(1931, 2021), 
+                     expand = c(0, 0), breaks = c(1931, 1950, 1975, 2000, 2021)) +
+  scale_color_viridis(discrete = TRUE) +
+   ggtitle("Long-term Well Records in California") +
+    theme_light() +
+  labs(color = "Well Site ID", y= "Feet below land surface (ft)", x = "Year")
+
+ggsave("example_wells.jpg", width = 7.29, height = 4.5, units = "in")
+   
+
+```
+
+
+
+
+
+
+Now let's explore a different visualization--a stacked area chart! 
+
+```{r}
+# Fill in the code below! 
+# Use `ggplot()` function 
+# Tell which data frame to use 
+# Specify the x and y variables (same as above) 
+# Specify the fill as 'site_id' 
+# Use `geom_area()` 
+# Reverse the y-axis (`scale_y_reverse()`)
+
+
+ggplot(data = ca_wells_final, aes(x= year, y= water_level_median, fill= site_id)) + 
+    geom_area() + 
+  scale_y_reverse() 
+
+
+```
+
+For fun...try running this code!! 
+
+```{r}
+
+myplot <- ggplot(data = ca_wells_final, 
+       aes(x = year, 
+           y = water_level_median, 
+           group = site_id, 
+           color = site_id)) +
+    geom_line() +
+    geom_point() +
+    scale_y_reverse() +
+    scale_color_brewer(palette = "RdYlBu") +
+    ggtitle("Long-term Well Records in California") +
+    theme_light() +
+    ylab("Feet below land surface (ft)") +
+    xlab("Year") +
+    transition_reveal(year)
+
+animate(myplot, duration = 10, fps = 20, renderer = gifski_renderer())
+
+```
+
+You should get an animated plot either in the "Viewer" Window (to the right --->) or try knitting the document. 
+
+## Final Visualization 
+
+Now it's time to make you to make your final figure for the figure competition. 
+
+Here are your steps: 
+
+1. You choose one or two long-term wells to display over time. Look back at the figures you just made. Pick the ones you think are the most interesting (there are no wrong answers here!). 
+2. Once you have picked your wells, copy their site_id number. Make a new data frame (called 'my_ca_wells' or something similar) and use the `filter()` function to filter your chosen sites so the data frame only contains your chosen wells. Example code here: (filter(site_id == c("site#", "site#")))
+3. Now it's time for you to pick your favorite visualization! Out of the visualizations we coded, which one do you think displays the data best? The most interesting? The sky is the limit here! You do not have to use a visualization we made, either. If you want to try something else, check out this resource: The R Graph Gallery (https://www.r-graph-gallery.com/). It has code to help you make all sorts of cool visualizations in R. 
+4. Once you have decided on your graph and plotted it with code, let's make it publication ready! Check out the advice below to format your visualization.
+Your final figure should include: 
+
+- Title 
+- x and y-axis labels 
+- Different color than the default in ggplot 
+- Legend with your site IDs 
+
+When you are done, save as a .jpg or .png file (code below) 
+
+#### How to format your graph: 
+
+Title, subtitle, and axes labels 
+
+```{r}
+# Add a title, a subtitle, and x and y-axis labels 
+
+# + labs(title = 
+#          subtitle = 
+#          x =
+#          y = )
+
+# Center the title and subtitle 
+
+# + theme(plot.title = element_text(hjust = 0.5), 
+#        plot.title = element_text(hjust = 0.5))
+
+```
+
+General theme & colors 
+
+```{r}
+# Explore different themes that change the general appearance of your visualization 
+
+# + theme_light()
+# + theme_gray()
+# + theme_bw()
+# + theme_minimal()
+# + theme_dark()
+# + theme_classic()
+# + theme_void() 
+
+#...And many more! Check out this resource for more details: https://ggplot2.tidyverse.org/reference/ggtheme.html
+
+```
+
+```{r}
+# Explore different color palettes 
+# Check out this page to see how the colors change with different color palettes: https://www.r-graph-gallery.com/ggplot2-color.html (scroll to "Changing the Color Scale with ggplot2")
+
+# Some color palettes are included with ggplot, like: 
+
+# hue
+# manual 
+# grey
+
+# R Color Brewer is also included: 
+
+# BuPu
+# RdYlBu
+# Paired
+# PuOr
+# Spectral 
+# Pastel1
+
+# Some you will need to install a new package to explore, like 'viridis' and 'paletteer' (install.packages("viridis"))
+
+# Magma 
+# Inferno 
+# Plasma 
+# viridis
+# Cividis
+# Nord
+# Awtools 
+# Dutchmasters
+# ggsci
+# ggthemes
+
+
+```
+
+Legend: 
+
+Check out this great resource for lots of details how to change your legend:
+
+http://www.sthda.com/english/wiki/ggplot2-legend-easy-steps-to-change-the-position-and-the-appearance-of-a-graph-legend-in-r-software
+
+
+#### How to save as a .png or .jpg file
+
+```{r}
+# Use `ggsave()`
+# Name your final figure your 'last name_final fig' (example: hilton_final_fig)
+# You can adjust the width and height for a certain look, or take those out and let the figure autogenerate 
+
+# ggsave("hilton_final_fig.jpg", width = 7.29, height = 4.5, units = "in")
+
+# ggsave("hilton_final_fig.jpg")
+
+```
+
+#### Make your final figure here: 
+
+```{r}
+
+
+
+
+```
+

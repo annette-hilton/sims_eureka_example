@@ -1,0 +1,13 @@
+---
+title: "Annette's Fun Times at SIMS"
+author: "Annette Hilton"
+date: "8/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Large Text for fun 
+###### super small text 
